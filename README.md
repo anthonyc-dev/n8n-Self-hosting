@@ -23,8 +23,8 @@ This repository contains a complete self-hosting setup for n8n (workflow automat
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/n8n-selfhost.git
-cd n8n-selfhost
+git clone https://github.com/anthonyc-dev/n8n-Self-hosting.git
+cd n8n-Self-hosting
 ```
 
 #### 2. Environment Configuration
@@ -114,7 +114,7 @@ git commit -m "Initial n8n self-hosting setup"
 
 ```bash
 # Add GitHub remote (replace with your actual repository URL)
-git remote add origin https://github.com/yourusername/n8n-selfhost.git
+git remote add origin https://github.com/anthonyc-dev/n8n-Self-hosting.git
 
 # Push to GitHub
 git branch -M main
