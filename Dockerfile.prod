@@ -1,0 +1,74 @@
+# ===========================================
+# Full Production Dockerfile for n8n
+# ===========================================
+# This builds n8n from scratch for maximum control and customization
+
+FROM node:18-alpine AS base
+
+# Install dependencies required for building native modules
+RUN apk add --update --no-cache \
+    python3 \
+    make \
+    g++ \
+    git \
+    openssh-client \
+    ca-certificates \
+    tzdata
+
+# Create app directory
+RUN mkdir -p /home/node/.n8n && chown -R node:node /home/node
+WORKDIR /home/node
+
+# Switch to node user
+USER node
+
+# Install n8n globally
+RUN npm install -g n8n
+
+# Production stage
+FROM node:18-alpine AS production
+
+# Install runtime dependencies only
+RUN apk add --update --no-cache \
+    ca-certificates \
+    tzdata \
+    tini
+
+# Copy timezone data
+ENV TZ=Asia/Manila
+
+# Create app directory and set permissions
+RUN mkdir -p /home/node/.n8n && chown -R node:node /home/node
+WORKDIR /home/node
+
+# Copy n8n from base stage
+COPY --from=base --chown=node:node /usr/local/lib/node_modules/n8n /usr/local/lib/node_modules/n8n
+COPY --from=base --chown=node:node /usr/local/bin/n8n /usr/local/bin/n8n
+
+# Switch to node user for security
+USER node
+
+# Environment variables for production
+ENV NODE_ENV=production \
+    N8N_LOG_LEVEL=info \
+    N8N_LOG_OUTPUT=console \
+    EXECUTIONS_DATA_PRUNE=true \
+    EXECUTIONS_DATA_MAX_AGE=168 \
+    N8N_METRICS=true \
+    N8N_DIAGNOSTICS_ENABLED=false \
+    N8N_VERSION_NOTIFICATIONS_ENABLED=false \
+    N8N_TEMPLATES_ENABLED=true \
+    N8N_USER_FOLDER=/home/node/.n8n
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD node -e "require('http').get('http://localhost:5678/healthz', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
+
+# Expose n8n port
+EXPOSE 5678
+
+# Use tini to handle signals properly
+ENTRYPOINT ["/sbin/tini", "--"]
+
+# Start n8n
+CMD ["n8n"]

@@ -1,0 +1,44 @@
+# Git files
+.git
+.gitignore
+.gitattributes
+
+# Documentation
+README.md
+*.md
+
+# Environment files
+.env
+.env.*
+
+# Docker files
+docker-compose*.yml
+Dockerfile*
+
+# Node modules (if any local development)
+node_modules
+npm-debug.log
+yarn-error.log
+
+# IDE and editor files
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.log
+temp
+tmp
+
+# nginx configuration (not needed in n8n container)
+nginx/
+
+# Claude configuration
+.claude/
